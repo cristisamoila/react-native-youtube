@@ -3,9 +3,14 @@ package com.inprogress.reactnativeyoutube;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.facebook.react.bridge.Arguments;
@@ -14,6 +19,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.google.android.youtube.player.YouTubePlayerFragment;
+import com.netcetera.reactnative.nativelib.R;
 
 import android.util.Log;
 
@@ -26,29 +32,58 @@ public class YouTubeView extends RelativeLayout {
     private YouTubePlayerFragment youTubePlayerFragment;
     public static String youtube_key;
 
+    private Activity parentActivity;
+
     public YouTubeView(ReactContext context) {
         super(context);
+        parentActivity = context.getCurrentActivity();
         init();
     }
 
     private ReactContext getReactContext() {
-        return (ReactContext)getContext();
+        return (ReactContext) getContext();
     }
 
+    //start
+//View has onDetachedFromWindow() when it is removed from the screen,
+// but this is not related to it being destroyed -- it could be attached again, which will call onAttachedToWindow().
+//end
     public void init() {
+        android.util.Log.d(TAG, "init");
         inflate(getContext(), R.layout.youtube_layout, this);
-        FragmentManager fragmentManager = getReactContext().getCurrentActivity().getFragmentManager();
+        fragmentManager = getReactContext().getCurrentActivity().getFragmentManager();
+
         youTubePlayerFragment = (YouTubePlayerFragment) fragmentManager
                 .findFragmentById(R.id.youtubeplayerfragment);
         youtubeController = new YouTubePlayerController(YouTubeView.this);
     }
 
+    private FragmentManager fragmentManager;
+    //start
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "mMessageReceiver.onReceive");
+            youtubeController.closeFullScreen();
+            //String message = intent.getStringExtra("message");
+            //Log.d("receiver", "Got message: " + message);
+        }
+    };
 
+    //end
+    @Override
+    protected void onAttachedToWindow() {
+        LocalBroadcastManager.getInstance(parentActivity).registerReceiver(
+                mMessageReceiver, new IntentFilter("back_pressed_event"));
+        super.onAttachedToWindow();
+
+    }
     @Override
     protected void onDetachedFromWindow() {
         try {
-            FragmentManager fragmentManager = getReactContext().getCurrentActivity().getFragmentManager();
-            youTubePlayerFragment = (YouTubePlayerFragment) 
+            LocalBroadcastManager.getInstance(parentActivity).unregisterReceiver(
+                    mMessageReceiver);
+            youTubePlayerFragment = (YouTubePlayerFragment)
                     fragmentManager.findFragmentById(R.id.youtubeplayerfragment);
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.remove(youTubePlayerFragment);
@@ -183,5 +218,7 @@ public class YouTubeView extends RelativeLayout {
             layout(getLeft(), getTop(), getRight(), getBottom());
         }
     };
+
+    //new onbackpressed try
 
 }
