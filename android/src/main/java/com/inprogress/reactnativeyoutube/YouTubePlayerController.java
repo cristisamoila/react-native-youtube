@@ -173,14 +173,16 @@ public class YouTubePlayerController implements
         mYouTubeView.receivedError(errorReason.toString());
     }
 
-    private void sendYoutubeuFullScreenButtonPressedEvent() {
+    private void sendYoutubeFullScreenButtonPressedEvent() {
         Intent intent = new Intent("youtube_full_screen_button_pressed");
         LocalBroadcastManager.getInstance(parentActivity).sendBroadcast(intent);
     }
 
     @Override
     public void onFullscreen(boolean isFullscreen) {
-        sendYoutubeuFullScreenButtonPressedEvent();
+        if(isFullscreen) {
+            sendYoutubeFullScreenButtonPressedEvent();
+        }
         mYouTubeView.didChangeToState(isFullscreen ? "fullscreenMode" : "windowMode");
 
         // When exiting full-screen mode and inline playback is not enabled

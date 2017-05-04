@@ -23,6 +23,7 @@ public class MainActivity extends ReactActivity {
 
     @Override
     public void onBackPressed() {
+        android.util.Log.d(TAG, "onBackPressed");
         if(isFullScreenOn){
             sendHardwareBackButtonPressedEvent();
             isFullScreenOn = false;
@@ -51,7 +52,7 @@ public class MainActivity extends ReactActivity {
         super.onResume();
     }
 
-    private boolean isFullScreenOn = true;
+    private boolean isFullScreenOn = false;
 
     private BroadcastReceiver mReceiverYoutubeFullScreenButtonPressed = new BroadcastReceiver() {
         @Override

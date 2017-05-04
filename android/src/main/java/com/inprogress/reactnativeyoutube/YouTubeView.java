@@ -70,23 +70,30 @@ public class YouTubeView extends RelativeLayout {
         super.onAttachedToWindow();
 
     }
+
     @Override
     protected void onDetachedFromWindow() {
-        try {
-            LocalBroadcastManager.getInstance(parentActivity).unregisterReceiver(
-                    mReceiverHardwareBackButtonPressed);
-            youTubePlayerFragment = (YouTubePlayerFragment)
-                    fragmentManager.findFragmentById(R.id.youtubeplayerfragment);
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.remove(youTubePlayerFragment);
-            ft.commit();
-        } catch (Exception e) {
-            Log.e(TAG, "Exception thrown in onDetachedFromWindow method...", e);
+        //added if because Activity is destroyed before onDetachedFromWindow is called
+        //still this bug in logs
+        //com.example E/OpenGLRenderer: SFEffectCache:clear(), mSize = 0
+        if (getReactContext() != null && getReactContext().getCurrentActivity() != null) {
+            try {
+                LocalBroadcastManager.getInstance(parentActivity).unregisterReceiver(
+                        mReceiverHardwareBackButtonPressed);
+                youTubePlayerFragment = (YouTubePlayerFragment)
+                        fragmentManager.findFragmentById(R.id.youtubeplayerfragment);
+                FragmentTransaction ft = fragmentManager.beginTransaction();
+                ft.remove(youTubePlayerFragment);
+                ft.commit();
+            } catch (Exception e) {
+                Log.e(TAG, "Exception thrown in onDetachedFromWindow method...", e);
+            }
+
+            getReactContext()
+                    .getCurrentActivity()
+                    .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            super.onDetachedFromWindow();
         }
-        getReactContext()
-                .getCurrentActivity()
-                .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        super.onDetachedFromWindow();
     }
 
     public void seekTo(int second) {
