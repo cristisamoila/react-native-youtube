@@ -10,18 +10,7 @@ import {
 import ReactYouTube from './ReactYouTube';
 
 export default class example extends Component {
- 	componentDidMount() {
-        BackAndroid.addEventListener('hardwareBackPress', this.handleBackButton);
-    }
-
-    componentWillUnmount() {
-        BackAndroid.removeEventListener('hardwareBackPress', this.handleBackButton);
-    }
-
-    handleBackButton() {
-        return true;
-    }
-    
+ 
   render() {
     return (
       <View style={styles.container}>

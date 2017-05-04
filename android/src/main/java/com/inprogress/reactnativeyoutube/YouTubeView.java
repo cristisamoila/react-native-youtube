@@ -9,17 +9,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.KeyEvent;
-import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.google.android.youtube.player.YouTubePlayerFragment;
-import com.netcetera.reactnative.nativelib.R;
 
 import android.util.Log;
 
@@ -44,10 +40,9 @@ public class YouTubeView extends RelativeLayout {
         return (ReactContext) getContext();
     }
 
-    //start
-//View has onDetachedFromWindow() when it is removed from the screen,
-// but this is not related to it being destroyed -- it could be attached again, which will call onAttachedToWindow().
-//end
+
+    //View has onDetachedFromWindow() when it is removed from the screen,
+    // but this is not related to it being destroyed -- it could be attached again, which will call onAttachedToWindow().
     public void init() {
         android.util.Log.d(TAG, "init");
         inflate(getContext(), R.layout.youtube_layout, this);
@@ -55,26 +50,23 @@ public class YouTubeView extends RelativeLayout {
 
         youTubePlayerFragment = (YouTubePlayerFragment) fragmentManager
                 .findFragmentById(R.id.youtubeplayerfragment);
-        youtubeController = new YouTubePlayerController(YouTubeView.this);
+        youtubeController = new YouTubePlayerController(YouTubeView.this, parentActivity);
     }
 
     private FragmentManager fragmentManager;
-    //start
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+
+    private BroadcastReceiver mReceiverHardwareBackButtonPressed = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "mMessageReceiver.onReceive");
+            Log.d(TAG, "mReceiverHardwareBackButtonPressed.onReceive");
             youtubeController.closeFullScreen();
-            //String message = intent.getStringExtra("message");
-            //Log.d("receiver", "Got message: " + message);
         }
     };
 
-    //end
     @Override
     protected void onAttachedToWindow() {
         LocalBroadcastManager.getInstance(parentActivity).registerReceiver(
-                mMessageReceiver, new IntentFilter("back_pressed_event"));
+                mReceiverHardwareBackButtonPressed, new IntentFilter("hardware_back_button_pressed"));
         super.onAttachedToWindow();
 
     }
@@ -82,7 +74,7 @@ public class YouTubeView extends RelativeLayout {
     protected void onDetachedFromWindow() {
         try {
             LocalBroadcastManager.getInstance(parentActivity).unregisterReceiver(
-                    mMessageReceiver);
+                    mReceiverHardwareBackButtonPressed);
             youTubePlayerFragment = (YouTubePlayerFragment)
                     fragmentManager.findFragmentById(R.id.youtubeplayerfragment);
             FragmentTransaction ft = fragmentManager.beginTransaction();

@@ -1,6 +1,8 @@
 package com.inprogress.reactnativeyoutube;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -27,10 +29,11 @@ public class YouTubePlayerController implements
     private boolean loop = false;
     private boolean playInline = false;
     private boolean fullscreen = true;
+    private Activity parentActivity;
 
-
-    public YouTubePlayerController(YouTubeView youTubeView) {
+    public YouTubePlayerController(YouTubeView youTubeView, Activity parentActivity) {
         this.mYouTubeView = youTubeView;
+        this.parentActivity = parentActivity;
     }
 
     @Override
@@ -170,8 +173,14 @@ public class YouTubePlayerController implements
         mYouTubeView.receivedError(errorReason.toString());
     }
 
+    private void sendYoutubeuFullScreenButtonPressedEvent() {
+        Intent intent = new Intent("youtube_full_screen_button_pressed");
+        LocalBroadcastManager.getInstance(parentActivity).sendBroadcast(intent);
+    }
+
     @Override
     public void onFullscreen(boolean isFullscreen) {
+        sendYoutubeuFullScreenButtonPressedEvent();
         mYouTubeView.didChangeToState(isFullscreen ? "fullscreenMode" : "windowMode");
 
         // When exiting full-screen mode and inline playback is not enabled

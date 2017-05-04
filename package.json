@@ -15,6 +15,11 @@
     "react",
     "react-native"
   ],
+    "peerDependencies": {
+    "react-native": "^0.42",
+	"react": "^15.4.2"
+
+  }
   "author": "Param Aggarwal",
   "license": "MIT",
   "bugs": {
