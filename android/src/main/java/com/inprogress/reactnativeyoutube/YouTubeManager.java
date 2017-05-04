@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class YouTubeManager extends SimpleViewManager<YouTubeView> {
 
-    public static final String REACT_CLASS = "ReactYouTube";
+    public static final String REACT_CLASS = "YouTubeManager";
 
     public YouTubeView mYouTubeView;
 
